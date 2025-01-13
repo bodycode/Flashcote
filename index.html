@@ -1,3 +1,8 @@
+To add the ability to create other users with admin access and save their decks so others can log in and see them, we'll need to implement a user management system and a way to persist data. For simplicity, I'll use local storage to save user data and decks. In a real-world application, you would typically use a database.
+
+### Updated HTML Structure
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +20,14 @@
         <input type="text" id="adminUsername" placeholder="Username">
         <input type="password" id="adminPassword" placeholder="Password">
         <button onclick="login()">Login</button>
+        <button onclick="showRegister()">Register</button>
+    </div>
+    <div id="register" style="display: none;">
+        <h2>Register Admin</h2>
+        <input type="text" id="newUsername" placeholder="Username">
+        <input type="password" id="newPassword" placeholder="Password">
+        <button onclick="register()">Register</button>
+        <button onclick="hideRegister()">Cancel</button>
     </div>
     <div id="admin" style="display: none;">
         <h2>Create</h2>
@@ -39,15 +52,38 @@
     </div>
 
     <script>
-        let decks = {};
-        let currentDeck = [];
-        let studySession = [];
-        const adminCredentials = { username: 'admin', password: 'password' }; // Simple credentials for demonstration
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let currentUser = null;
+        let decks = JSON.parse(localStorage.getItem('decks')) || {};
+
+        function showRegister() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('register').style.display = 'block';
+        }
+
+        function hideRegister() {
+            document.getElementById('register').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+        }
+
+        function register() {
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            if (username && password) {
+                users[username] = { password, decks: {} };
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('Registration successful');
+                hideRegister();
+            } else {
+                alert('Please enter a username and password');
+            }
+        }
 
         function login() {
             const username = document.getElementById('adminUsername').value;
             const password = document.getElementById('adminPassword').value;
-            if (username === adminCredentials.username && password === adminCredentials.password) {
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('admin').style.display = 'block';
                 updateDeckList();
@@ -59,7 +95,8 @@
         function createDeck() {
             const deckName = document.getElementById('deckName').value;
             if (deckName) {
-                decks[deckName] = [];
+                users[currentUser].decks[deckName] = [];
+                localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
                 document.getElementById('deckName').value = '';
                 document.getElementById('addFlashcardForm').style.display = 'block';
@@ -71,7 +108,7 @@
             const decksDiv = document.getElementById('decks');
             deckSelect.innerHTML = '';
             decksDiv.innerHTML = '';
-            for (let deck in decks) {
+            for (let deck in users[currentUser].decks) {
                 let option = document.createElement('option');
                 option.value = deck;
                 option.textContent = deck;
@@ -92,7 +129,7 @@
         function updateCardList(deckName) {
             const cardsDiv = document.getElementById(`cards-${deckName}`);
             cardsDiv.innerHTML = '';
-            decks[deckName].forEach((card, index) => {
+            users[currentUser].decks[deckName].forEach((card, index) => {
                 let cardDiv = document.createElement('div');
                 cardDiv.innerHTML = `
                     <p>Question: ${card.question}</p>
@@ -108,33 +145,37 @@
         function editDeck(deckName) {
             const newDeckName = prompt('Enter new deck name:', deckName);
             if (newDeckName && newDeckName !== deckName) {
-                decks[newDeckName] = decks[deckName];
-                delete decks[deckName];
+                users[currentUser].decks[newDeckName] = users[currentUser].decks[deckName];
+                delete users[currentUser].decks[deckName];
+                localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
             }
         }
 
         function deleteDeck(deckName) {
             if (confirm(`Are you sure you want to delete the deck "${deckName}"?`)) {
-                delete decks[deckName];
+                delete users[currentUser].decks[deckName];
+                localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
             }
         }
 
         function editCard(deckName, index) {
-            const card = decks[deckName][index];
+            const card = users[currentUser].decks[deckName][index];
             const newQuestion = prompt('Enter new question:', card.question);
             const newAnswer = prompt('Enter new answer:', card.answer);
             const newImage = prompt('Enter new image URL (optional):', card.image);
             if (newQuestion && newAnswer) {
-                decks[deckName][index] = { question: newQuestion, answer: newAnswer, image: newImage, rating: 0 };
+                users[currentUser].decks[deckName][index] = { question: newQuestion, answer: newAnswer, image: newImage, rating: 0 };
+                localStorage.setItem('users', JSON.stringify(users));
                 updateCardList(deckName);
             }
         }
 
         function deleteCard(deckName, index) {
             if (confirm('Are you sure you want to delete this card?')) {
-                decks[deckName].splice(index, 1);
+                users[currentUser].decks[deckName].splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
                 updateCardList(deckName);
             }
         }
@@ -146,7 +187,8 @@
             const image = document.getElementById('image').value;
 
             if (deckName && question && answer) {
-                decks[deckName].push({ question, answer, image, rating: 0 });
+                users[currentUser].decks[deckName].push({ question, answer, image, rating: 0 });
+                localStorage.setItem('users', JSON.stringify(users));
                 document.getElementById('question').value = '';
                 document.getElementById('answer').value = '';
                 document.getElementById('image').value = '';
@@ -157,7 +199,7 @@
         function startStudying() {
             const deckName = document.getElementById('deckSelect').value;
             if (deckName) {
-                currentDeck = decks[deckName].slice();
+                currentDeck = users[currentUser].decks[deckName].slice();
                 studySession = [];
                 showFlashcard();
                 document.getElementById('stopButton').style.display = 'block';
@@ -181,7 +223,6 @@
                 flashcardDiv.innerHTML = '<p>No flashcards in this deck.</p>';
             }
         }
-
         function revealAnswer() {
             const flashcardDiv = document.getElementById('flashcard');
             const card = currentDeck[0];
@@ -220,7 +261,7 @@
             }
         }
 
-function stopStudying() {
+        function stopStudying() {
             const totalCards = studySession.length;
             const totalScore = studySession.reduce((sum, card) => sum + card.rating, 0);
             const maxScore = totalCards * 5;
