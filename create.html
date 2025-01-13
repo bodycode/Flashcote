@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcote - Create</title>
+    <title>Flashcote - Admin</title>
     <style>
         /* Add your CSS styling here */
     </style>
 </head>
 <body>
-    <h1>Flashcote - Create</h1>
+    <h1>Flashcote - Admin</h1>
     <button onclick="location.href='index.html'">Home</button>
     <div id="login">
         <h2>Admin Login</h2>
@@ -32,6 +32,7 @@
         <div id="decks"></div>
         <div id="addFlashcardForm" style="display: none;">
             <h3>Add Flashcard</h3>
+            <select id="deckSelect"></select>
             <input type="text" id="question" placeholder="Question">
             <input type="text" id="answer" placeholder="Answer">
             <input type="text" id="image" placeholder="Image URL (optional)">
@@ -74,6 +75,7 @@
                 document.getElementById('login').style.display = 'none';
                 document.getElementById('admin').style.display = 'block';
                 updateDeckList();
+                updateDeckSelect();
             } else {
                 alert('Invalid credentials');
             }
@@ -85,6 +87,7 @@
                 users[currentUser].decks[deckName] = [];
                 localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
+                updateDeckSelect();
                 document.getElementById('deckName').value = '';
                 document.getElementById('addFlashcardForm').style.display = 'block';
             }
@@ -103,6 +106,17 @@
                 `;
                 decksDiv.appendChild(deckDiv);
                 updateCardList(deck);
+            }
+        }
+
+        function updateDeckSelect() {
+            const deckSelect = document.getElementById('deckSelect');
+            deckSelect.innerHTML = '';
+            for (let deck in users[currentUser].decks) {
+                let option = document.createElement('option');
+                option.value = deck;
+                option.textContent = deck;
+                deckSelect.appendChild(option);
             }
         }
 
@@ -129,6 +143,7 @@
                 delete users[currentUser].decks[deckName];
                 localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
+                updateDeckSelect();
             }
         }
 
@@ -137,6 +152,7 @@
                 delete users[currentUser].decks[deckName];
                 localStorage.setItem('users', JSON.stringify(users));
                 updateDeckList();
+                updateDeckSelect();
             }
         }
 
