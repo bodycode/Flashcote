@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcote</title>
+    <style>
+        /* Add your CSS styling here */
+    </style>
+</head>
+<body>
+    <h1>Flashcote</h1>
+    <div id="admin">
+        <h2>Admin Side</h2>
+        <input type="text" id="deckName" placeholder="Deck Name">
+        <button onclick="createDeck()">Create Deck</button>
+        <div id="decks"></div>
+    </div>
+    <div id="student">
+        <h2>Student Side</h2>
+        <select id="deckSelect" onchange="selectDeck()"></select>
+        <div id="flashcard"></div>
+    </div>
+
+    <script>
+        let decks = {};
+
+        function createDeck() {
+            const deckName = document.getElementById('deckName').value;
+            if (deckName) {
+                decks[deckName] = [];
+                updateDeckList();
+                document.getElementById('deckName').value = '';
+            }
+        }
+
+        function updateDeckList() {
+            const deckSelect = document.getElementById('deckSelect');
+            deckSelect.innerHTML = '';
+            for (let deck in decks) {
+                let option = document.createElement('option');
+                option.value = deck;
+                option.textContent = deck;
+                deckSelect.appendChild(option);
+            }
+        }
+
+        function selectDeck() {
+            const deckName = document.getElementById('deckSelect').value;
+            if (deckName) {
+                showFlashcard(deckName);
+            }
+        }
+
+        function showFlashcard(deckName) {
+            const flashcardDiv = document.getElementById('flashcard');
+            flashcardDiv.innerHTML = '';
+            const deck = decks[deckName];
+            if (deck.length > 0) {
+                const card = deck[0]; // Simplified for demonstration
+                flashcardDiv.innerHTML = `
+                    <div>
+                        <p>${card.question}</p>
+                        ${card.image ? `<img src="${card.image}" alt="Image">` : ''}
+                        <button onclick="revealAnswer('${deckName}')">Reveal</button>
+                    </div>
+                `;
+            } else {
+                flashcardDiv.innerHTML = '<p>No flashcards in this deck.</p>';
+            }
+        }
+
+        function revealAnswer(deckName) {
+            const flashcardDiv = document.getElementById('flashcard');
+            const deck = decks[deckName];
+            const card = deck[0]; // Simplified for demonstration
+            flashcardDiv.innerHTML = `
+                <div>
+                    <p>${card.question}</p>
+                    ${card.image ? `<img src="${card.image}" alt="Image">` : ''}
+                    <p>${card.answer}</p>
+                    <label>Rate your knowledge: </label>
+                    <select id="rating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button onclick="rateCard('${deckName}')">Submit</button>
+                </div>
+            `;
+        }
+
+        function rateCard(deckName) {
+            const rating = document.getElementById('rating').value;
+            // Handle rating logic here
+            // For simplicity, we'll just remove the card from the deck
+            decks[deckName].shift();
+            showFlashcard(deckName);
+        }
+    </script>
+</body>
+</html>
