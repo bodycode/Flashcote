@@ -27,10 +27,14 @@
         <h2>Student Side</h2>
         <select id="deckSelect" onchange="selectDeck()"></select>
         <div id="flashcard"></div>
+        <button id="stopButton" onclick="stopStudying()" style="display: none;">I cannot go on anymore!</button>
+        <div id="result" style="display: none;"></div>
     </div>
 
     <script>
         let decks = {};
+        let currentDeck = [];
+        let studySession = [];
 
         function createDeck() {
             const deckName = document.getElementById('deckName').value;
@@ -60,7 +64,7 @@
             const image = document.getElementById('image').value;
 
             if (deckName && question && answer) {
-                decks[deckName].push({ question, answer, image });
+                decks[deckName].push({ question, answer, image, rating: 0 });
                 document.getElementById('question').value = '';
                 document.getElementById('answer').value = '';
                 document.getElementById('image').value = '';
@@ -70,21 +74,24 @@
         function selectDeck() {
             const deckName = document.getElementById('deckSelect').value;
             if (deckName) {
-                showFlashcard(deckName);
+                currentDeck = decks[deckName].slice();
+                studySession = [];
+                showFlashcard();
+                document.getElementById('stopButton').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
             }
         }
 
-        function showFlashcard(deckName) {
+        function showFlashcard() {
             const flashcardDiv = document.getElementById('flashcard');
             flashcardDiv.innerHTML = '';
-            const deck = decks[deckName];
-            if (deck.length > 0) {
-                const card = deck[0]; // Simplified for demonstration
+            if (currentDeck.length > 0) {
+                const card = currentDeck[0];
                 flashcardDiv.innerHTML = `
                     <div>
                         <p>${card.question}</p>
                         ${card.image ? `<img src="${card.image}" alt="Image">` : ''}
-                        <button onclick="revealAnswer('${deckName}')">Reveal</button>
+                        <button onclick="revealAnswer()">Reveal</button>
                     </div>
                 `;
             } else {
@@ -92,10 +99,9 @@
             }
         }
 
-        function revealAnswer(deckName) {
+        function revealAnswer() {
             const flashcardDiv = document.getElementById('flashcard');
-            const deck = decks[deckName];
-            const card = deck[0]; // Simplified for demonstration
+            const card = currentDeck[0];
             flashcardDiv.innerHTML = `
                 <div>
                     <p>${card.question}</p>
@@ -109,17 +115,38 @@
                         <option value="4">4</option>
                         <option value="5">5</option>
                     </select>
-                    <button onclick="rateCard('${deckName}')">Submit</button>
+                    <button onclick="rateCard()">Submit</button>
                 </div>
             `;
         }
 
-        function rateCard(deckName) {
+        function rateCard() {
             const rating = document.getElementById('rating').value;
-            // Handle rating logic here
-            // For simplicity, we'll just remove the card from the deck
-            decks[deckName].shift();
-            showFlashcard(deckName);
+            const card = currentDeck.shift();
+            card.rating = parseInt(rating);
+            studySession.push(card);
+            adjustDeck(card);
+            showFlashcard();
+        }
+
+        function adjustDeck(card) {
+            if (card.rating < 3) {
+                currentDeck.push(card);
+            } else if (card.rating < 5) {
+                currentDeck.splice(Math.floor(currentDeck.length / 2), 0, card);
+            }
+        }
+
+        function stopStudying() {
+            const totalCards = studySession.length;
+            const totalScore = studySession.reduce((sum, card) => sum + card.rating, 0);
+            const maxScore = totalCards * 5;
+            const percentage = (totalScore / maxScore) * 100;
+
+            document.getElementById('flashcard').innerHTML = '';
+            document.getElementById('stopButton').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').innerHTML = `<p>You mastered ${percentage.toFixed(2)}% of the cards.</p>`;
         }
     </script>
 </body>
