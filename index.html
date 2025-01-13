@@ -15,6 +15,13 @@
         <input type="text" id="deckName" placeholder="Deck Name">
         <button onclick="createDeck()">Create Deck</button>
         <div id="decks"></div>
+        <div id="addFlashcardForm" style="display: none;">
+            <h3>Add Flashcard</h3>
+            <input type="text" id="question" placeholder="Question">
+            <input type="text" id="answer" placeholder="Answer">
+            <input type="text" id="image" placeholder="Image URL (optional)">
+            <button onclick="addFlashcard()">Add Flashcard</button>
+        </div>
     </div>
     <div id="student">
         <h2>Student Side</h2>
@@ -31,6 +38,7 @@
                 decks[deckName] = [];
                 updateDeckList();
                 document.getElementById('deckName').value = '';
+                document.getElementById('addFlashcardForm').style.display = 'block';
             }
         }
 
@@ -42,6 +50,20 @@
                 option.value = deck;
                 option.textContent = deck;
                 deckSelect.appendChild(option);
+            }
+        }
+
+        function addFlashcard() {
+            const deckName = document.getElementById('deckSelect').value;
+            const question = document.getElementById('question').value;
+            const answer = document.getElementById('answer').value;
+            const image = document.getElementById('image').value;
+
+            if (deckName && question && answer) {
+                decks[deckName].push({ question, answer, image });
+                document.getElementById('question').value = '';
+                document.getElementById('answer').value = '';
+                document.getElementById('image').value = '';
             }
         }
 
