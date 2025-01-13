@@ -17,7 +17,7 @@
         <button onclick="login()">Login</button>
     </div>
     <div id="admin" style="display: none;">
-        <h2>Admin Side</h2>
+        <h2>Create</h2>
         <input type="text" id="deckName" placeholder="Deck Name">
         <button onclick="createDeck()">Create Deck</button>
         <div id="decks"></div>
@@ -30,8 +30,9 @@
         </div>
     </div>
     <div id="student">
-        <h2>Student Side</h2>
-        <select id="deckSelect" onchange="selectDeck()"></select>
+        <h2>Study</h2>
+        <select id="deckSelect"></select>
+        <button onclick="startStudying()">Start</button>
         <div id="flashcard"></div>
         <button id="stopButton" onclick="stopStudying()" style="display: none;">I cannot go on anymore!</button>
         <div id="result" style="display: none;"></div>
@@ -153,7 +154,7 @@
             }
         }
 
-        function selectDeck() {
+        function startStudying() {
             const deckName = document.getElementById('deckSelect').value;
             if (deckName) {
                 currentDeck = decks[deckName].slice();
@@ -219,7 +220,7 @@
             }
         }
 
-        function stopStudying() {
+function stopStudying() {
             const totalCards = studySession.length;
             const totalScore = studySession.reduce((sum, card) => sum + card.rating, 0);
             const maxScore = totalCards * 5;
