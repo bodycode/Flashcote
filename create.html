@@ -55,21 +55,25 @@
         }
 
         function register() {
-            const username = document.getElementById('newUsername').value;
-            const password = document.getElementById('newPassword').value;
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
             if (username && password) {
-                users[username] = { password, decks: {} };
-                localStorage.setItem('users', JSON.stringify(users));
-                alert('Registration successful');
-                hideRegister();
+                if (users[username]) {
+                    alert('Username already exists');
+                } else {
+                    users[username] = { password, decks: {} };
+                    localStorage.setItem('users', JSON.stringify(users));
+                    alert('Registration successful');
+                    hideRegister();
+                }
             } else {
-                alert('Please enter a username and password');
+                alert('Please enter a valid username and password');
             }
         }
 
         function login() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
             if (users[username] && users[username].password === password) {
                 currentUser = username;
                 document.getElementById('login').style.display = 'none';
@@ -82,14 +86,20 @@
         }
 
         function createDeck() {
-            const deckName = document.getElementById('deckName').value;
+            const deckName = document.getElementById('deckName').value.trim();
             if (deckName) {
-                users[currentUser].decks[deckName] = [];
-                localStorage.setItem('users', JSON.stringify(users));
-                updateDeckList();
-                updateDeckSelect();
-                document.getElementById('deckName').value = '';
-                document.getElementById('addFlashcardForm').style.display = 'block';
+                if (users[currentUser].decks[deckName]) {
+                    alert('Deck already exists');
+                } else {
+                    users[currentUser].decks[deckName] = [];
+                    localStorage.setItem('users', JSON.stringify(users));
+                    updateDeckList();
+                    updateDeckSelect();
+                    document.getElementById('deckName').value = '';
+                    document.getElementById('addFlashcardForm').style.display = 'block';
+                }
+            } else {
+                alert('Please enter a deck name');
             }
         }
 
@@ -178,9 +188,9 @@
 
         function addFlashcard() {
             const deckName = document.getElementById('deckSelect').value;
-            const question = document.getElementById('question').value;
-            const answer = document.getElementById('answer').value;
-            const image = document.getElementById('image').value;
+            const question = document.getElementById('question').value.trim();
+            const answer = document.getElementById('answer').value.trim();
+            const image = document.getElementById('image').value.trim();
 
             if (deckName && question && answer) {
                 users[currentUser].decks[deckName].push({ question, answer, image, rating: 0 });
@@ -189,6 +199,8 @@
                 document.getElementById('answer').value = '';
                 document.getElementById('image').value = '';
                 updateCardList(deckName);
+            } else {
+                alert('Please fill in all fields');
             }
         }
     </script>
