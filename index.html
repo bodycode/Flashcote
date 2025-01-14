@@ -30,6 +30,7 @@
         <input type="password" id="adminPassword" placeholder="Password">
         <button onclick="login()">Login</button>
         <button onclick="showRegister()">Register</button>
+        <button onclick="showRecovery()">Forgot Username/Password</button>
     </div>
     <div id="register" style="display: none;">
         <h2>Register Admin</h2>
@@ -38,6 +39,12 @@
         <input type="email" id="email" placeholder="Email">
         <button onclick="register()">Register</button>
         <button onclick="hideRegister()">Cancel</button>
+    </div>
+    <div id="recovery" style="display: none;">
+        <h2>Recover Username/Password</h2>
+        <input type="email" id="recoveryEmail" placeholder="Enter your email">
+        <button onclick="recover()">Recover</button>
+        <button onclick="hideRecovery()">Cancel</button>
     </div>
     <div id="admin" style="display: none;">
         <h2>Create</h2>
@@ -65,6 +72,16 @@
 
         function hideRegister() {
             document.getElementById('register').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+        }
+
+        function showRecovery() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('recovery').style.display = 'block';
+        }
+
+        function hideRecovery() {
+            document.getElementById('recovery').style.display = 'none';
             document.getElementById('login').style.display = 'block';
         }
 
@@ -216,6 +233,22 @@
                 updateCardList(deckName);
             } else {
                 alert('Please fill in all fields');
+            }
+        }
+
+        function recover() {
+            const email = document.getElementById('recoveryEmail').value.trim();
+            if (email) {
+                for (let username in users) {
+                    if (users[username].email === email) {
+                        alert(`Your username is: ${username}`);
+                        // Optionally, you could add password reset functionality here
+                        return;
+                    }
+                }
+                alert('No account associated with this email');
+            } else {
+                alert('Please enter a valid email');
             }
         }
     </script>
