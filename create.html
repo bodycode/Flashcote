@@ -41,6 +41,12 @@
         </div>
     </div>
 
+    <!-- Password Recovery Section -->
+    <div id="passwordRecovery">
+        <h2>Password Recovery</h2>
+        <input type="email" id="recoveryEmail" placeholder="Enter your email">
+        <button onclick="recover()">Send Reset Email</button>
+    </div>
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || {};
         let currentUser = null;
@@ -205,6 +211,29 @@
                 alert('Please fill in all fields');
             }
         }
+        function recover() {
+    const email = document.getElementById('recoveryEmail').value.trim();
+    if (email) {
+        fetch('http://localhost:3000/send-reset-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    } else {
+        alert('Please enter a valid email');
+    }
+}
+
     </script>
 </body>
 </html>
