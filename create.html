@@ -47,6 +47,13 @@
         <input type="email" id="recoveryEmail" placeholder="Enter your email">
         <button onclick="recover()">Send Reset Email</button>
     </div>
+
+    <!-- Success Message Section (initially hidden) -->
+    <div id="passwordResetSuccess" style="display: none;">
+        <h2>Check Your Email</h2>
+        <p>A password reset link has been sent to your email.</p>
+    </div>
+
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || {};
         let currentUser = null;
@@ -223,7 +230,12 @@
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);
+            if (data.message === 'Reset email sent') {
+                document.getElementById('passwordRecovery').style.display = 'none';
+                document.getElementById('passwordResetSuccess').style.display = 'block';
+            } else {
+                alert(data.message);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
