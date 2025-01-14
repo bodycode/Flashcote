@@ -22,6 +22,7 @@
         <h2>Register Admin</h2>
         <input type="text" id="newUsername" placeholder="Username">
         <input type="password" id="newPassword" placeholder="Password">
+        <input type="email" id="email" placeholder="Email">
         <button onclick="register()">Register</button>
         <button onclick="hideRegister()">Cancel</button>
     </div>
@@ -57,17 +58,18 @@
         function register() {
             const username = document.getElementById('newUsername').value.trim();
             const password = document.getElementById('newPassword').value.trim();
-            if (username && password) {
+            const email = document.getElementById('email').value.trim();
+            if (username && password && email) {
                 if (users[username]) {
                     alert('Username already exists');
                 } else {
-                    users[username] = { password, decks: {} };
+                    users[username] = { password, email, decks: {} };
                     localStorage.setItem('users', JSON.stringify(users));
                     alert('Registration successful');
                     hideRegister();
                 }
             } else {
-                alert('Please enter a valid username and password');
+                alert('Please enter a valid username, password, and email');
             }
         }
 
