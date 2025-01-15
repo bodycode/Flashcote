@@ -23,28 +23,33 @@ app.post('/send-reset-email', (req, res) => {
     let username = null;
 
     for (let user in users) {
-        if (users
-        [user].email === email) {
-                    username = user;
-                    break;
-                }
-            }
+        if (users[user].email === email)
+        {
+            username = user;
+            break;
+        }
+        }
 
-            if (username) {
-                const mailOptions = {
-                    from: 'your-email@gmail.com',
-                    to: email,
-                    subject: 'Password Reset',
-                    text: `Hello ${username}, please use the following link to reset your password: http://example.com/reset-password?user=${username}`
-                };
+        if (username) {
+        const mailOptions = {
+            from: 'your-email@gmail.com',
+            to: email,
+            subject: 'Password Reset',
+            text: `Hello ${username},\n\nPlease click the following link to reset your password: http://yourdomain.com/reset-password?user=${username}`
+        };
 
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        return res.status(500).send('Error sending email');
-                    }
-                    res.status(200).send('Reset email sent');
-                });
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+            return res.status(500).send('Error sending email');
             } else {
-                res.status(404).send('Email not found');
+            return res.status(200).send('Reset email sent');
             }
         });
+        } else {
+        return res.status(404).send('Email not found');
+        }
+    });
+
+    app.listen(3000, () => {
+        console.log('Server is running on port 3000');
+    });
