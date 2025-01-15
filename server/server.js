@@ -24,3 +24,27 @@ app.post('/send-reset-email', (req, res) => {
 
     for (let user in users) {
         if (users
+        [user].email === email) {
+                    username = user;
+                    break;
+                }
+            }
+
+            if (username) {
+                const mailOptions = {
+                    from: 'your-email@gmail.com',
+                    to: email,
+                    subject: 'Password Reset',
+                    text: `Hello ${username}, please use the following link to reset your password: http://example.com/reset-password?user=${username}`
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return res.status(500).send('Error sending email');
+                    }
+                    res.status(200).send('Reset email sent');
+                });
+            } else {
+                res.status(404).send('Email not found');
+            }
+        });
