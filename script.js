@@ -2,7 +2,15 @@
 function login() {
     const username = document.getElementById('adminUsername').value.trim();
     const password = document.getElementById('adminPassword').value.trim();
-    // Your login function code
+    
+    // Example login logic
+    if (username === 'admin' && password === 'password') {
+        alert('Login successful');
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('admin').style.display = 'block';
+    } else {
+        alert('Invalid username or password');
+    }
 }
 
 // Function to show registration form
@@ -16,7 +24,15 @@ function register() {
     const newUsername = document.getElementById('newUsername').value.trim();
     const newPassword = document.getElementById('newPassword').value.trim();
     const email = document.getElementById('email').value.trim();
-    // Your register function code
+    
+    // Example registration logic
+    if (newUsername && newPassword && email) {
+        alert('Registration successful');
+        document.getElementById('register').style.display = 'none';
+        document.getElementById('login').style.display = 'block';
+    } else {
+        alert('Please fill in all fields');
+    }
 }
 
 // Function to hide registration form
