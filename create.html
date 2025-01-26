@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcote - Admin</title>
+    <style>
+        /* Add your CSS styling here */
+    </style>
+</head>
+<body>
+    <h1>Flashcote - Admin</h1>
+    <button onclick="location.href='index.html'">Home</button>
+    <div id="login">
+        <h2>Admin Login</h2>
+        <input type="text" id="adminUsername" placeholder="Username">
+        <input type="password" id="adminPassword" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <button onclick="showRegister()">Register</button>
+    </div>
+    <div id="register" style="display: none;">
+        <h2>Register Admin</h2>
+        <input type="text" id="newUsername" placeholder="Username">
+        <input type="password" id="newPassword" placeholder="Password">
+        <input type="email" id="email" placeholder="Email">
+        <button onclick="register()">Register</button>
+        <button onclick="hideRegister()">Cancel</button>
+    </div>
+    <div id="admin" style="display: none;">
+        <h2>Create</h2>
+        <input type="text" id="deckName" placeholder="Deck Name">
+        <button onclick="createDeck()">Create Deck</button>
+        <div id="decks"></div>
+        <div id="addFlashcardForm" style="display: none;">
+            <h3>Add Flashcard</h3>
+            <select id="deckSelect"></select>
+            <input type="text" id="question" placeholder="Question">
+            <input type="text" id="answer" placeholder="Answer">
+            <input type="text" id="image" placeholder="Image URL (optional)">
+            <button onclick="addFlashcard()">Add Flashcard</button>
+        </div>
+    </div>
+
+    <!-- Password Recovery Section -->
+    <div id="passwordRecovery">
+        <h2>Password Recovery</h2>
+        <input type="email" id="recoveryEmail" placeholder="Enter your email">
+        <button onclick="recover()">Send Reset Email</button>
+    </div>
+
+    <!-- Success Message Section (initially hidden) -->
+    <div id="passwordResetSuccess" style="display: none;">
+        <h2>Check Your Email</h2>
+        <p>A password reset link has been sent to your email.</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcote - Study</title>
+    <style>
+        /* Add your CSS styling here */
+    </style>
+</head>
+<body>
+    <h1>Flashcote - Study</h1>
+    <button onclick="location.href='index.html'">Home</button>
+    <div id="student">
+        <h2>Study</h2>
+        <select id="deckSelect"></select>
+        <button onclick="startStudying()">Start</button>
+        <div id="flashcard"></div>
+        <button id="stopButton" onclick="stopStudying()" style="display: none;">I cannot go on anymore!</button>
+        <div id="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let currentDeck = [];
+        let studySession = [];
+
+        function updateDeckList() {
+            const deckSelect = document.getElementById('deckSelect');
+            deckSelect.innerHTML = '';
+            for (let user in users) {
+                for (let deck in users[user].decks) {
+                    let option = document.createElement('option');
+                    option.value = `${user}:${deck}`;
+                    option.textContent = `${user} - ${deck}`;
+                    deckSelect.appendChild(option);
+                }
+            }
+        }
+
+        function startStudying() {
+            const selectedDeck = document.getElementById('deckSelect').value;
+            if (selectedDeck) {
+                const [user, deckName] = selectedDeck.split(':');
+                currentDeck = users[user].decks[deckName].slice();
+                studySession = [];
+                showFlashcard();
+                document.getElementById('stopButton').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+            }
+        }
+
+        function showFlashcard() {
+            const flashcardDiv = document.getElementById('flashcard');
+            flashcardDiv.innerHTML = '';
+            if (currentDeck.length > 0) {
+                const card = currentDeck[0];
+                flashcardDiv.innerHTML = `
+                    <div>
+                        <p>${card.question}</p>
+                        ${card.image ? `<img src="${card.image}" alt="Image">` : ''}
+                        <button onclick="revealAnswer()">Reveal</button>
+                    </div>
+                `;
+            } else {
+                flashcardDiv.innerHTML = '<p>No flashcards in this deck.</p>';
+            }
+        }
+
+        function revealAnswer() {
+            const flashcardDiv = document.getElementById('flashcard');
+            const card = currentDeck[0];
+            flashcardDiv.innerHTML = `
+                <div>
+                    <p>${card.question}</p>
+                    ${card.image ? `<img src="${card.image}" alt="Image">` : ''}
+                    <p>${card.answer}</p>
+                    <label>Rate your knowledge: </label>
+                    <select id="rating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button onclick="rateCard()">Submit</button>
+                </div>
+            `;
+        }
+
+        function rateCard() {
+            const rating = document.getElementById('rating').value;
+            const card = currentDeck.shift();
+            card.rating = parseInt(rating);
+            studySession.push(card);
+            adjustDeck(card);
+            showFlashcard();
+        }
+
+        function adjustDeck(card) {
+            if (card.rating < 3) {
+                currentDeck.push(card);
+            } else if (card.rating < 5) {
+                currentDeck.splice(Math.floor(currentDeck.length / 2), 0, card);
+            }
+        }
+
+        function stopStudying() {
+            const totalCards = studySession.length;
+            const totalScore = studySession.reduce((sum, card) => sum + card.rating, 0);
+            const maxScore = totalCards * 5;
+            const percentage = (totalScore / maxScore) * 100;
+
+            document.getElementById('flashcard').innerHTML = '';
+            document.getElementById('stopButton').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').innerHTML = `<p>You mastered ${percentage.toFixed(2)}% of the cards.</p>`;
+        }
+
+        // Initialize deck list on page load
+        updateDeckList();
+    </script>
+</body>
+</html>
